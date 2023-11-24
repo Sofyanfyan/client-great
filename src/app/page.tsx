@@ -1,10 +1,10 @@
 "use client";
-import Image from "next/image";
 import { useState } from "react";
+import Login from "@/components/Login";
+import Register from "@/components/Register";
 
 export default function Home() {
   const [isLogin, setLogin] = useState(true);
-  const [isHide, setHide] = useState(false);
 
   return (
     <>
@@ -20,53 +20,36 @@ export default function Home() {
                     className="w-12"
                     alt="tailus logo"
                   />
-                  <h2 className="mb-8 text-2xl text-cyan-900 font-bold">
-                    Sign in to register
-                  </h2>
-                  <h2 className="mb-8 text-2xl text-cyan-900 font-bold">
-                    students.
-                  </h2>
+                  {isLogin ? (
+                    <>
+                      <h2 className="mb-8 text-2xl text-cyan-900 font-bold">
+                        Sign in to register
+                      </h2>
+                      <h2 className="mb-8 text-2xl text-cyan-900 font-bold">
+                        students.
+                      </h2>
+                    </>
+                  ) : (
+                    <>
+                      <h2 className="mb-8 text-2xl text-cyan-900 font-bold">
+                        Create an account
+                      </h2>
+                      <h2 className="mb-8 text-2xl text-cyan-900 font-bold">
+                        parents.
+                      </h2>
+                    </>
+                  )}
                 </div>
-                <div className="mt-16 grid space-y-2">
-                  <div className="mb-2">
-                    <label className="block mb-2 text-sm font-medium text-gray-500">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      placeholder="E-mail"
-                      className="bg-gray-50 border 
-                      border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    />
-                  </div>
-                  <div className="mb-2">
-                    <label className="block mb-2 text-sm font-medium text-gray-500">
-                      Password
-                    </label>
-                    <div className="flex rounded-lg shadow-sm">
-                      <input
-                        type={isHide ? "password" : "text"}
-                        id="password"
-                        placeholder="Password"
-                        className="bg-gray-50 border 
-                      border-gray-300 text-gray-900 text-sm rounded-l-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                      />
-                      <button
-                        type="button"
-                        className="w-[2.875rem] h-[2.875rem] flex-shrink-0 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-e-md border 
-                        border-transparent bg-gray-300 text-white border-gray-30 disabled:opacity-50 disabled:pointer-events-none"
-                        onClick={() => setHide(!isHide)}
-                      >
-                        {isHide ? (
-                          <i className="fa-solid fa-eye-slash"></i>
-                        ) : (
-                          <i className="fa-solid fa-eye"></i>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </div>
+
+                {isLogin ? <Login /> : <Register />}
+
+                <button
+                  type="button"
+                  className=" w-full rounded-full text-[#e4532f] hover:text-white border border-[#e4532f] hover:bg-[#e4532f] focus:ring-4 focus:outline-none focus:ring-red-300 font-medium text-sm px-5 py-2.5 text-center me-2 mb-2 mt-6"
+                  onClick={() => setLogin(!isLogin)}
+                >
+                  {isLogin ? "Sign Up" : "Sign In"}
+                </button>
 
                 <div className="mt-32 space-y-4 text-gray-600 text-center sm:-mb-8">
                   <p className="text-xs">
