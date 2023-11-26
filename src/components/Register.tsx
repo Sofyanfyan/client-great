@@ -4,6 +4,7 @@ import Loading from "./btn/Loading";
 
 export default function Register() {
   const [isHide, setHide] = useState(true);
+  const [isHide1, setHide1] = useState(true);
   const [isSubmit, setSubmit] = useState(false);
 
   const [push, setPush] = useState({
@@ -11,6 +12,7 @@ export default function Register() {
     password: "",
     re_password: "",
     relation: "mother",
+    isValid: true,
   });
 
   const [error, setError] = useState({
@@ -20,53 +22,115 @@ export default function Register() {
     relation: "",
   });
 
+  const btnClassName =
+    "text-white w-full bg-[#e4532f] hover:bg-[#e98369] focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-6 py-2.5 text-center me-2 mb-2";
+  const btnDisable =
+    "text-white w-full bg-[#d8907f] hover:bg-[#da9b88] focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-6 py-2.5 text-center me-2 mb-2 cursor-not-allowed";
+
   const handleEventChange = (event: any) => {
+    event.preventDefault();
     const { name, value } = event.target;
 
     setPush((prevState) => ({ ...prevState, [name]: value }));
+
+    if (push.email && push.password && push.re_password && push.relation) {
+      setPush((prevState) => ({ ...prevState, isValid: false }));
+    } else setPush((prevState) => ({ ...prevState, isValid: true }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (event: any) => {
+    event.preventDefault();
+    console.log(push.isValid);
+
     const emailRegex = /\S+@\S+\.\S+/;
     const isValidEmail = emailRegex.test(push.email);
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
     const isValidPassword = passwordRegex.test(push.password);
 
-    if (!push.email || !push.password) {
+    if (
+      !push.email ||
+      !push.password ||
+      !isValidEmail ||
+      !isValidPassword ||
+      !push.re_password ||
+      push.password.length < 6 ||
+      push.password !== push.re_password
+    ) {
+      // email
       if (!push.email) {
         setError((prevState) => ({
           ...prevState,
           email: "Please enter your email.",
         }));
+      } else if (!isValidEmail) {
+        setError((prevState) => ({
+          ...prevState,
+          email: "Please enter a valid email address.",
+        }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          email: "",
+        }));
       }
+
+      // password
       if (!push.password) {
         setError((prevState) => ({
           ...prevState,
           password: "Please enter your password.",
+        }));
+      } else if (push.password.length < 6) {
+        setError((prevState) => ({
+          ...prevState,
+          password: "Password must constain at least 6 character",
+        }));
+      } else if (!isValidPassword) {
+        setError((prevState) => ({
+          ...prevState,
+          password:
+            "Password must contain at least one uppercase letter, one lowercase letter, and one number.",
+        }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          password: "",
+        }));
+      }
+
+      // retype password
+      if (!push.re_password) {
+        setError((prevState) => ({
+          ...prevState,
+          re_password: "Please retype your password.",
+        }));
+      } else if (push.password !== push.re_password) {
+        setError((prevState) => ({
+          ...prevState,
+          re_password: "Password not match.",
+        }));
+      } else {
+        setError((prevState) => ({
+          ...prevState,
+          re_password: "",
         }));
       }
 
       return;
     }
 
-    if (!isValidEmail || !isValidPassword) {
-      setError((prevState) => ({
-        ...prevState,
-        email: "Please enter a valid email address.",
-      }));
-
-      return;
-    }
-
-    setError({
-      email: "",
-      password: "",
-      re_password: "",
-      relation: "",
-    });
-
     setSubmit(true);
   };
+
+  const emailClassName =
+    "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5";
+  const errorEmailClassName =
+    "bg-red-50 border border-red-500 text-red-900 text-sm placeholder-red-700 rounded-lg focus:ring-red-500 block w-full p-2.5";
+
+  const passwordClassName =
+    "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-l-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5";
+  const errorPasswordClassName =
+    "bg-red-50 border border-red-500 text-red-900 text-sm placeholder-red-700 rounded-l-md focus:ring-red-500 block w-full p-2.5";
 
   return (
     <>
@@ -80,11 +144,15 @@ export default function Register() {
             id="email"
             name="email"
             placeholder="E-mail"
-            className="bg-gray-50 border 
-                      border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            className={error.email ? errorEmailClassName : emailClassName}
             value={push.email}
             onChange={handleEventChange}
           />
+          {error.email ? (
+            <p className="mb-2 text-sm text-red-600 dark:text-red-500">
+              <span className="font-medium">Errors! </span> {error.email}
+            </p>
+          ) : null}
         </div>
         <div className="mb-2">
           <label className="block mb-2 text-sm font-medium text-gray-500">
@@ -96,7 +164,9 @@ export default function Register() {
               id="password"
               name="password"
               placeholder="Password"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-l-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              className={
+                error.password ? errorPasswordClassName : passwordClassName
+              }
               value={push.password}
               onChange={handleEventChange}
             />
@@ -115,6 +185,11 @@ export default function Register() {
               )}
             </button>
           </div>
+          {error.password ? (
+            <p className="mb-2 text-sm text-red-600 dark:text-red-500">
+              <span className="font-medium">Errors! </span> {error.password}
+            </p>
+          ) : null}
         </div>
         <div className="mb-2">
           <label className="block mb-2 text-sm font-medium text-gray-500">
@@ -122,11 +197,13 @@ export default function Register() {
           </label>
           <div className="flex rounded-lg shadow-sm">
             <input
-              type={isHide ? "password" : "text"}
+              type={isHide1 ? "password" : "text"}
               id="re_password"
               name="re_password"
               placeholder="Retype password"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-l-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              className={
+                error.re_password ? errorPasswordClassName : passwordClassName
+              }
               value={push.re_password}
               onChange={handleEventChange}
             />
@@ -135,16 +212,21 @@ export default function Register() {
               className="w-[2.875rem] h-[2.875rem] flex-shrink-0 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-e-md border 
                         border-transparent bg-gray-300 text-white border-gray-30 disabled:opacity-50 disabled:pointer-events-none"
               onClick={() => {
-                setHide(!isHide);
+                setHide1(!isHide1);
               }}
             >
-              {isHide ? (
+              {isHide1 ? (
                 <i className="fa-solid fa-eye-slash"></i>
               ) : (
                 <i className="fa-solid fa-eye"></i>
               )}
             </button>
           </div>
+          {error.re_password ? (
+            <p className="mb-2 text-sm text-red-600 dark:text-red-500">
+              <span className="font-medium">Errors! </span> {error.re_password}
+            </p>
+          ) : null}
         </div>
         <label className="block mb-2 text-sm font-medium text-gray-500">
           As a student's parent
@@ -167,8 +249,9 @@ export default function Register() {
         ) : (
           <button
             type="button"
-            className="text-white w-full bg-[#e4532f] hover:bg-[#e98369] focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-6 py-2.5 text-center me-2 mb-2"
-            onClick={() => setSubmit(true)}
+            className={!push.isValid ? btnClassName : btnDisable}
+            onClick={handleSubmit}
+            disabled={push.isValid}
           >
             Register
           </button>

@@ -8,6 +8,7 @@ export default function Login() {
   const [push, setPush] = useState({
     email: "",
     password: "",
+    isValid: true,
   });
 
   const [error, setError] = useState({
@@ -15,10 +16,18 @@ export default function Login() {
     password: "",
   });
 
+  const btnClassName =
+    "text-white w-full bg-[#e4532f] hover:bg-[#e98369] focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-6 py-2.5 text-center me-2 mb-2";
+  const btnDisable =
+    "text-white w-full bg-[#d8907f] hover:bg-[#da9b88] focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-6 py-2.5 text-center me-2 mb-2 cursor-not-allowed";
   const handleEventChange = (event: any) => {
     const { name, value } = event.target;
 
     setPush((prevState) => ({ ...prevState, [name]: value }));
+
+    if (push.email && push.password)
+      setPush((prevState) => ({ ...prevState, isValid: false }));
+    else setPush((prevState) => ({ ...prevState, isValid: true }));
   };
 
   const handleSubmit = () => {
@@ -27,11 +36,16 @@ export default function Login() {
     // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
     // const isValidPassword = passwordRegex.test(push.password);
 
-    if (!push.email || !push.password) {
+    if (!push.email || !push.password || !isValidEmail) {
       if (!push.email) {
         setError((prevState) => ({
           ...prevState,
           email: "Please enter your email.",
+        }));
+      } else if (!isValidEmail) {
+        setError((prevState) => ({
+          ...prevState,
+          email: "Please enter a valid email address.",
         }));
       }
       if (!push.password) {
@@ -43,20 +57,6 @@ export default function Login() {
 
       return;
     }
-
-    if (!isValidEmail) {
-      setError((prevState) => ({
-        ...prevState,
-        email: "Please enter a valid email address.",
-      }));
-
-      return;
-    }
-
-    setError({
-      email: "",
-      password: "",
-    });
 
     setSubmit(true);
   };
@@ -138,8 +138,9 @@ export default function Login() {
         ) : (
           <button
             type="button"
-            className="text-white w-full bg-[#e4532f] hover:bg-[#e98369] focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-6 py-2.5 text-center me-2 mb-2"
+            className={!push.isValid ? btnClassName : btnDisable}
             onClick={handleSubmit}
+            disabled={push.isValid}
           >
             Log In
           </button>
